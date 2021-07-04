@@ -52,7 +52,7 @@ app.post('/campgrounds', catchAsync(async (req, res, next) => {
 
 // show page
 app.get('/campgrounds/:id', async (req
-    , res) => {
+    , res,next) => {
     const {id} = req.params;
     const campground = await Campground.findById(id);
     res.render('campgrounds/show', {campground})
