@@ -1,21 +1,25 @@
 const express = require('express');
 const app = express();
 
-const catchAsync = require('./utils/catchAsync');
 const methodOverride = require('method-override');
 const ExpressError = require('./utils/ExpressError');
+
+const path = require('path');
+app.use(express.urlencoded({extended: true}));
+app.use(methodOverride('_method'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 
 // ======================
 // database stuff
 // ======================
 const mongoose = require('mongoose');
-const {reviewSchema} = require('./schemas.js');
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useFindAndModify: false
 });
 
 const db = mongoose.connection;
@@ -30,12 +34,67 @@ db.once("open", () => {
 const ejsMate = require('ejs-mate');
 app.engine('ejs', ejsMate)
 app.set('view engine', 'ejs');
-
-const path = require('path');
 app.set('views', path.join(__dirname, 'views'))
 
-app.use(express.urlencoded({extended: true}));
-app.use(methodOverride('_method'));
+
+// ======================
+// session
+// ======================
+const session = require('express-session');
+const sessionConfig = {
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,      // a week later
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
+}
+app.use(session(sessionConfig));
+
+
+// ======================
+// passport
+// ======================
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const User = require('./models/user')
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+
+// ======================
+// flash
+// ======================
+const flash = require('connect-flash');
+
+app.use(flash());
+app.use((req, res, next) => {
+    if (!['/login', '/'].includes(req.originalUrl)) {
+        req.session.returnTo = req.originalUrl;
+    }
+    res.locals.currentUser = req.user;
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+})
+
+
+app.get('/fakeuser', async (req, res) => {
+    const user = new User({
+        email: 'gmail@gmail.com',
+        username: 'ryan'
+    });
+
+    const newUser = await User.register(user, 'chicken');
+    res.send(newUser);
+})
 
 
 // ======================
@@ -44,39 +103,16 @@ app.use(methodOverride('_method'));
 const campgroundsRoutes = require('./routes/campgrounds');
 app.use('/campgrounds', campgroundsRoutes);
 
+const reviewsRoutes = require('./routes/reviews');
+app.use('/campgrounds/:id/reviews', reviewsRoutes);
+
+const usersRoutes = require('./routes/users');
+app.use('/', usersRoutes);
+
 app.get('/', (req, res) => {
     res.render('home')
 });
 
-
-const validateReview = (req, res, next) => {
-    const {error} = reviewSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400)
-    } else {
-        next();
-    }
-}
-
-app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
-    const review = new Review(req.body.review);
-    campground.reviews.push(review);
-    await review.save();
-    await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`);
-}))
-
-app.delete('/campgrounds/:id/reviews/:reviewId', catchAsync(async (req, res) => {
-    const {id, reviewId} = req.params;
-    console.log(id);
-    console.log(reviewId);
-
-    await Campground.findByIdAndUpdate(id, {$pull: {reviews: reviewId}});
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/campgrounds/${id}`);
-}))
 
 app.all('*', (req, res, next) => {
     next(new ExpressError('Page Not Found', 404))
