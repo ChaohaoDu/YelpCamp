@@ -85,18 +85,6 @@ app.use((req, res, next) => {
     next();
 })
 
-
-app.get('/fakeuser', async (req, res) => {
-    const user = new User({
-        email: 'gmail@gmail.com',
-        username: 'ryan'
-    });
-
-    const newUser = await User.register(user, 'chicken');
-    res.send(newUser);
-})
-
-
 // ======================
 // router
 // ======================
@@ -129,7 +117,7 @@ app.use((err, req, res, next) => {
 })
 
 app.listen(3000, () => {
-    console.log('Serving on port 3000')
+    console.log('Serving on http://localhost:3000/campgrounds')
 })
 
 
