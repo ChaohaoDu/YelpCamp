@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
+
 const express = require('express');
 const app = express();
 
@@ -9,13 +13,17 @@ app.use(express.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 // ======================
-// database stuff
+// database + session
 // ======================
 const mongoose = require('mongoose');
+const session = require('express-session');
+const mongoSanitize = require('express-mongo-sanitize');
+const MongoStore = require("connect-mongo");
+const secret = process.env.SECRET || 'secret';
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
 
-mongoose.connect('mongodb://localhost:27017/yelp-camp', {
+mongoose.connect(dbUrl, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -28,6 +36,39 @@ db.once("open", () => {
     console.log("Database connected");
 });
 
+app.use(mongoSanitize({replaceWith: '_'}));
+
+const store =  MongoStore.create({
+    mongoUrl: dbUrl,
+    touchAfter: 24 * 3600,
+    crypto: {
+        secret: secret,
+
+    }
+});
+
+app.use(session({
+    secret: secret,
+    store: store
+}));
+
+store.on('error', function (e) {
+    console.log("session store err", e);
+})
+// const sessionConfig = {
+//     store,
+//     secret: secret,
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: {
+//         httpOnly: true,
+//         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,      // a week later
+//         maxAge: 1000 * 60 * 60 * 24 * 7
+//     }
+// }
+
+// app.use(session(sessionConfig));
+
 // ======================
 // ejs template
 // ======================
@@ -35,23 +76,6 @@ const ejsMate = require('ejs-mate');
 app.engine('ejs', ejsMate)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
-
-
-// ======================
-// session
-// ======================
-const session = require('express-session');
-const sessionConfig = {
-    secret: 'secret',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        httpOnly: true,
-        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,      // a week later
-        maxAge: 1000 * 60 * 60 * 24 * 7
-    }
-}
-app.use(session(sessionConfig));
 
 
 // ======================
@@ -98,7 +122,7 @@ const usersRoutes = require('./routes/users');
 app.use('/', usersRoutes);
 
 app.get('/', (req, res) => {
-    res.render('home')
+    res.render('./home')
 });
 
 

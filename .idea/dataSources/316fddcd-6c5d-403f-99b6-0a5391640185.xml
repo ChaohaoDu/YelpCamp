@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="@localhost">
+  <database-model serializer="dbm" dbms="MONGO" family-id="MONGO" format-version="4.21">
+    <root id="1">
+      <ServerVersion>4.4.4</ServerVersion>
+    </root>
+    <schema id="2" parent="1" name="admin"/>
+    <schema id="3" parent="1" name="animalShelter"/>
+    <schema id="4" parent="1" name="config"/>
+    <schema id="5" parent="1" name="expresscart"/>
+    <schema id="6" parent="1" name="farmStand"/>
+    <schema id="7" parent="1" name="local"/>
+    <schema id="8" parent="1" name="loginDemo"/>
+    <schema id="9" parent="1" name="moviesApp"/>
+    <schema id="10" parent="1" name="yelp-camp"/>
+    <table id="11" parent="10" name="campgrounds"/>
+    <table id="12" parent="10" name="reviews"/>
+    <table id="13" parent="10" name="sessions"/>
+    <table id="14" parent="10" name="users"/>
+    <column id="15" parent="11" name="_id">
+      <Position>1</Position>
+      <DataType>ObjectId|12s</DataType>
+    </column>
+    <column id="16" parent="11" name="author">
+      <Position>1</Position>
+      <DataType>ObjectId|12s</DataType>
+    </column>
+    <column id="17" parent="11" name="title">
+      <Position>1</Position>
+      <DataType>String|12s</DataType>
+    </column>
+    <column id="18" parent="11" name="__v">
+      <Position>1</Position>
+      <DataType>Int32|4s</DataType>
+    </column>
+    <column id="19" parent="11" name="description">
+      <Position>1</Position>
+      <DataType>String|12s</DataType>
+    </column>
+    <column id="20" parent="11" name="location">
+      <Position>1</Position>
+      <DataType>String|12s</DataType>
+    </column>
+    <column id="21" parent="11" name="reviews">
+      <Position>1</Position>
+      <DataType>list|4999545s</DataType>
+    </column>
+    <column id="22" parent="11" name="images">
+      <Position>1</Position>
+      <DataType>list|4999545s</DataType>
+    </column>
+    <column id="23" parent="11" name="price">
+      <Position>2</Position>
+      <DataType>Int32|4s</DataType>
+    </column>
+    <column id="24" parent="11" name="images._id">
+      <Position>2</Position>
+      <DataType>ObjectId|12s</DataType>
+    </column>
+    <column id="25" parent="11" name="images.filename">
+      <Position>3</Position>
+      <DataType>String|12s</DataType>
+    </column>
+    <column id="26" parent="11" name="images.url">
+      <Position>4</Position>
+      <DataType>String|12s</DataType>
+    </column>
+    <column id="27" parent="12" name="_id">
+      <Position>1</Position>
+      <DataType>ObjectId|12s</DataType>
+    </column>
+    <column id="28" parent="12" name="author">
+      <Position>1</Position>
+      <DataType>ObjectId|12s</DataType>
+    </column>
+    <column id="29" parent="12" name="body">
+      <Position>1</Position>
+      <DataType>String|12s</DataType>
+    </column>
+    <column id="30" parent="12" name="rating">
+      <Position>1</Position>
+      <DataType>Int32|4s</DataType>
+    </column>
+    <column id="31" parent="12" name="__v">
+      <Position>2</Position>
+      <DataType>Int32|4s</DataType>
+    </column>
+    <column id="32" parent="13" name="_id">
+      <Position>1</Position>
+      <DataType>String|12s</DataType>
+    </column>
+    <column id="33" parent="13" name="expires">
+      <Position>1</Position>
+      <DataType>ISODate|91s</DataType>
+    </column>
+    <column id="34" parent="13" name="lastModified">
+      <Position>1</Position>
+      <DataType>ISODate|91s</DataType>
+    </column>
+    <column id="35" parent="13" name="session">
+      <Position>1</Position>
+      <DataType>String|12s</DataType>
+    </column>
+    <column id="36" parent="14" name="_id">
+      <Position>1</Position>
+      <DataType>ObjectId|12s</DataType>
+    </column>
+    <column id="37" parent="14" name="__v">
+      <Position>1</Position>
+      <DataType>Int32|4s</DataType>
+    </column>
+    <column id="38" parent="14" name="email">
+      <Position>1</Position>
+      <DataType>String|12s</DataType>
+    </column>
+    <column id="39" parent="14" name="salt">
+      <Position>1</Position>
+      <DataType>String|12s</DataType>
+    </column>
+    <column id="40" parent="14" name="username">
+      <Position>1</Position>
+      <DataType>String|12s</DataType>
+    </column>
+    <column id="41" parent="14" name="hash">
+      <Position>1</Position>
+      <DataType>String|12s</DataType>
+    </column>
+  </database-model>
+</dataSource>
