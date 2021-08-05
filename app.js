@@ -49,7 +49,14 @@ const store =  MongoStore.create({
 
 app.use(session({
     secret: secret,
-    store: store
+    store: store,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,      // a week later
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
 }));
 
 store.on('error', function (e) {
@@ -140,8 +147,11 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render('error', {err})
 })
 
-app.listen(3000, () => {
-    console.log('Serving on http://localhost:3000/campgrounds')
+
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+    console.log(`Serving on port ${port}`);
 })
 
 
